@@ -2,198 +2,443 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <title>Admin Yönetim Paneli</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Personel Yönetimi</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,500;0,6..72,600;1,6..72,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --ink: #1D2233;
+            --ink-soft: #565D74;
+            --paper: #F5F5F2;
+            --surface: #FFFFFF;
+            --line: #E4E3DD;
+            --primary: #2E3A5C;
+            --primary-hover: #232C48;
+            --accent: #B8873F;
+            --accent-soft: #FBF3E6;
+            --danger: #A8402F;
+            --danger-soft: #FBEEEC;
+            --success: #3E7454;
+            --success-soft: #EDF4EE;
+            --warning: #B8873F;
+            --warning-soft: #FBF3E6;
+            --radius: 10px;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f5f6f8;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--paper);
             margin: 0;
-            padding: 20px;
-            color: #333;
+            padding: 24px;
+            color: var(--ink);
+            -webkit-font-smoothing: antialiased;
         }
 
-        .wrapper {
-            max-width: 1000px;
-            margin: 40px auto;
-            background: white;
-            padding: 30px;
-            border-radius: 16px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-        }
-
-        /* Başlıklar ve Butonlar */
-        h2 {
-            margin-top: 0;
-            color: #2c3e50;
+        h1, h2, h3 {
+            font-family: 'Newsreader', Georgia, serif;
+            margin: 0;
+            color: var(--ink);
             font-weight: 600;
+            letter-spacing: -0.01em;
         }
 
+        p {
+            color: var(--ink-soft);
+            margin: 4px 0 0;
+            font-size: 14px;
+        }
+
+        /* ---- Buttons ---- */
         button {
-            padding: 10px 16px;
-            border: none;
+            padding: 10px 18px;
             border-radius: 8px;
             cursor: pointer;
             font-weight: 600;
-            font-size: 14px;
-            transition: 0.2s;
+            font-size: 13.5px;
+            font-family: 'Inter', sans-serif;
+            border: 1px solid transparent;
+            transition: background 0.15s ease, border-color 0.15s ease, transform 0.05s ease;
         }
 
-            button:hover {
-                opacity: 0.9;
+            button:active {
+                transform: translateY(1px);
             }
 
         .btn-primary {
-            background-color: #4A89F3;
-            color: white;
+            background: var(--primary);
+            color: #fff;
         }
+
+            .btn-primary:hover {
+                background: var(--primary-hover);
+            }
+
+        .btn-ghost {
+            background: transparent;
+            color: var(--ink-soft);
+            border-color: var(--line);
+        }
+
+            .btn-ghost:hover {
+                border-color: var(--ink-soft);
+                color: var(--ink);
+            }
 
         .btn-danger {
-            background-color: #e53935;
-            color: white;
+            background: transparent;
+            color: var(--danger);
+            border-color: #E9C9C2;
         }
+
+            .btn-danger:hover {
+                background: var(--danger-soft);
+            }
 
         .btn-warning {
-            background-color: #ff9800;
-            color: white;
+            background: transparent;
+            color: var(--warning);
+            border-color: #E7D2AC;
         }
+
+            .btn-warning:hover {
+                background: var(--warning-soft);
+            }
 
         .btn-success {
-            background-color: #4CAF50;
-            color: white;
+            background: var(--success);
+            color: #fff;
         }
 
-        /* Form Kutuları */
+            .btn-success:hover {
+                background: #325F45;
+            }
+
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 12.5px;
+            border-radius: 6px;
+        }
+
+        /* ---- Layout ---- */
+        .wrapper {
+            max-width: 980px;
+            margin: 32px auto;
+            background: var(--surface);
+            border: 1px solid var(--line);
+            border-radius: 16px;
+            padding: 36px 40px;
+        }
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            padding-bottom: 22px;
+            border-bottom: 1px solid var(--line);
+            margin-bottom: 26px;
+            flex-wrap: wrap;
+            gap: 14px;
+        }
+
+            .topbar .actions {
+                display: flex;
+                gap: 8px;
+            }
+
+        /* ---- Form panels ---- */
         .kutu {
-            background: #faf8fb;
-            border: 1px solid #e0e0e0;
-            padding: 20px;
-            border-radius: 12px;
-            margin: 20px 0;
+            background: #FAFAF8;
+            border: 1px solid var(--line);
+            padding: 22px 24px;
+            border-radius: var(--radius);
+            margin: 0 0 26px;
             display: none;
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
         }
 
-        input, select {
-            padding: 10px;
-            margin: 6px 0;
-            width: 100%;
-            box-sizing: border-box;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            font-size: 14px;
-            background: white;
+            .kutu h3 {
+                font-size: 18px;
+                margin-bottom: 16px;
+            }
+
+                .kutu h3 span {
+                    color: var(--accent);
+                }
+
+        .grid2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px 14px;
         }
 
-        /* Tablo Tasarımı */
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-            background: white;
-            border-radius: 8px;
-            overflow: hidden;
-        }
-
-        th, td {
-            padding: 12px 16px;
-            text-align: left;
-            border-bottom: 1px solid #eee;
-            font-size: 14px;
-        }
-
-        th {
-            background-color: #4A89F3;
-            color: white;
+        .field label {
+            display: block;
+            font-size: 12px;
+            color: var(--ink-soft);
+            margin-bottom: 4px;
             font-weight: 500;
         }
 
-        tr:hover {
-            background-color: #f9f9f9;
+        input, select {
+            padding: 10px 12px;
+            margin: 0;
+            width: 100%;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: 'Inter', sans-serif;
+            background: #fff;
+            color: var(--ink);
         }
 
-        /* Login Ekranı Tasarımı */
+            input::placeholder {
+                color: #A6ABBB;
+            }
+
+            input:focus, select:focus {
+                outline: none;
+                border-color: var(--primary);
+                box-shadow: 0 0 0 3px rgba(46, 58, 92, 0.1);
+            }
+
+        .kutu .form-actions {
+            margin-top: 18px;
+            display: flex;
+            gap: 8px;
+        }
+
+        /* ---- Table ---- */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            text-align: left;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--ink-soft);
+            padding: 10px 14px;
+            border-bottom: 1px solid var(--line);
+        }
+
+        td {
+            padding: 14px;
+            font-size: 14px;
+            border-bottom: 1px solid var(--line);
+            vertical-align: middle;
+        }
+
+        tbody tr:hover {
+            background: #FAFAF8;
+        }
+
+        tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        td .row-actions {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        /* ---- Login screen ---- */
         #loginEkrani {
-            max-width: 400px;
-            margin: 100px auto;
-            background: white;
-            padding: 30px;
+            max-width: 380px;
+            margin: 12vh auto 0;
+            background: var(--surface);
+            border: 1px solid var(--line);
+            padding: 40px 36px;
             border-radius: 16px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-            text-align: center;
+            text-align: left;
         }
 
-            #loginEkrani input {
-                margin-bottom: 15px;
+            #loginEkrani h2 {
+                font-size: 24px;
+            }
+
+            #loginEkrani p {
+                margin-bottom: 26px;
+            }
+
+            #loginEkrani .field {
+                margin-bottom: 14px;
             }
 
             #loginEkrani button {
                 width: 100%;
                 padding: 12px;
+                margin-top: 6px;
             }
+
+        .mark {
+            width: 34px;
+            height: 34px;
+            border-radius: 8px;
+            background: var(--primary);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Newsreader', serif;
+            font-weight: 600;
+            margin-bottom: 18px;
+        }
+
+        @media (max-width: 640px) {
+            .wrapper {
+                padding: 24px 20px;
+            }
+
+            .grid2 {
+                grid-template-columns: 1fr;
+            }
+
+            table, thead, tbody, th, td, tr {
+                display: block;
+            }
+
+            thead {
+                display: none;
+            }
+
+            td {
+                border-bottom: none;
+                padding: 6px 4px;
+            }
+
+            tr {
+                padding: 12px 0;
+                border-bottom: 1px solid var(--line);
+            }
+
+            td:before {
+                content: attr(data-label);
+                display: block;
+                font-size: 11px;
+                color: var(--ink-soft);
+                margin-bottom: 2px;
+            }
+        }
     </style>
 </head>
 <body>
 
     <!-- GİRİŞ EKRANI -->
     <div id="loginEkrani">
+        <div class="mark">P</div>
         <h2>Personel Girişi</h2>
-        <input type="text" id="kAdi" placeholder="Kullanıcı Adı">
-        <input type="password" id="sifre" placeholder="Şifre">
+        <p>Devam etmek için hesap bilgilerinizi girin.</p>
+        <div class="field">
+            <label for="kAdi">Kullanıcı Adı</label>
+            <input type="text" id="kAdi" placeholder="kullanici.adi">
+        </div>
+        <div class="field">
+            <label for="sifre">Şifre</label>
+            <input type="password" id="sifre" placeholder="••••••••">
+        </div>
         <button class="btn-primary" onclick="giris()">Giriş Yap</button>
     </div>
 
     <!-- ADMIN PANELİ -->
     <div id="adminEkrani" class="wrapper" style="display:none;">
-        <div style="display: flex; justify-content: space-between; align-items: center;">
-            <h2>Yönetim Paneli</h2>
+        <div class="topbar">
             <div>
-                <button class="btn-primary" onclick="goster('ekleForm')">+ Yeni Personel Ekle</button>
-                <button class="btn-danger" onclick="cikis()">Çıkış Yap</button>
+                <h2>Yönetim Paneli</h2>
+                <p>Personel kayıtlarını görüntüleyin ve yönetin.</p>
+            </div>
+            <div class="actions">
+                <button class="btn-primary" onclick="goster('ekleForm')">+ Yeni Personel</button>
+                <button class="btn-ghost" onclick="cikis()">Çıkış Yap</button>
             </div>
         </div>
-        <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
 
         <!-- YENİ EKLE FORMU -->
         <div id="ekleForm" class="kutu">
             <h3>Yeni Personel Ekle</h3>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                <input id="eUser" placeholder="Kullanıcı Adı"> <input id="ePass" type="password" placeholder="Şifre">
-                <input id="eAd" placeholder="Ad"> <input id="eSoyad" placeholder="Soyad">
-                <input id="eTc" placeholder="TC Kimlik No"> <input id="eBolum" placeholder="Bölüm">
-                <select id="eRole"><option value="Personel">Personel</option><option value="Admin">Admin</option></select>
+            <div class="grid2">
+                <div class="field"><label>Kullanıcı Adı</label><input id="eUser" placeholder="kullanici.adi"></div>
+                <div class="field"><label>Şifre</label><input id="ePass" type="password" placeholder="••••••••"></div>
+                <div class="field"><label>Ad</label><input id="eAd" placeholder="Ad"></div>
+                <div class="field"><label>Soyad</label><input id="eSoyad" placeholder="Soyad"></div>
+                <div class="field"><label>TC Kimlik No</label><input id="eTc" placeholder="11 haneli"></div>
+                <div class="field"><label>Bölüm</label><input id="eBolum" placeholder="Örn: Muhasebe"></div>
+                <div class="field"><label>İşe Giriş Tarihi</label><input id="eTarih" type="date"></div>
+                <div class="field">
+                    <label>Rol</label>
+                    <select id="eRole">
+                        <option value="Personel">Personel</option>
+                        <option value="Admin">Admin</option>
+                        <option value="Emekli">Emekli</option>
+                        <option value="Kovuldu">Kovuldu</option>
+                        <option value="Ayrıldı">Ayrıldı</option>
+                    </select>
+                </div>
             </div>
-            <br>
-            <button class="btn-success" onclick="ekle()">Kaydet</button>
-            <button class="btn-danger" onclick="gizle('ekleForm')">İptal</button>
+            <div class="form-actions">
+                <button class="btn-success" onclick="ekle()">Kaydet</button>
+                <button class="btn-ghost" onclick="gizle('ekleForm')">İptal</button>
+            </div>
         </div>
 
         <!-- DÜZENLE FORMU -->
         <div id="duzenleForm" class="kutu">
             <h3>Personel Düzenle</h3>
             <input type="hidden" id="dId">
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                <input id="dAd" placeholder="Ad"> <input id="dSoyad" placeholder="Soyad">
-                <input id="dTc" placeholder="TC Kimlik No"> <input id="dBolum" placeholder="Bölüm">
-                <select id="dRole"><option value="Personel">Personel</option><option value="Admin">Admin</option></select>
+            <div class="grid2">
+                <div class="field"><label>Ad</label><input id="dAd" placeholder="Ad"></div>
+                <div class="field"><label>Soyad</label><input id="dSoyad" placeholder="Soyad"></div>
+                <div class="field"><label>TC Kimlik No</label><input id="dTc" placeholder="11 haneli"></div>
+                <div class="field"><label>Bölüm</label><input id="dBolum" placeholder="Örn: Muhasebe"></div>
+                <div class="field"><label>İşe Giriş Tarihi</label><input id="dTarih" type="date"></div>
+                <div class="field">
+                    <label>Rol</label>
+                    <select id="dRole">
+                        <option value="Personel">Personel</option>
+                        <option value="Admin">Admin</option>
+                        <option value="Emekli">Emekli</option>
+                        <option value="Kovuldu">Kovuldu</option>
+                        <option value="Ayrıldı">Ayrıldı</option>
+                    </select>
+                </div>
             </div>
-            <br>
-            <button class="btn-success" onclick="duzenle()">Güncelle</button>
-            <button class="btn-danger" onclick="gizle('duzenleForm')">İptal</button>
+            <div class="form-actions">
+                <button class="btn-success" onclick="duzenle()">Güncelle</button>
+                <button class="btn-ghost" onclick="gizle('duzenleForm')">İptal</button>
+            </div>
         </div>
 
         <!-- BORDRO EKLE FORMU -->
         <div id="bordroForm" class="kutu">
-            <h3>Maaş Ekle (<span id="bIsim" style="color: #4A89F3;"></span>)</h3>
+            <h3>Maaş Ekle · <span id="bIsim"></span></h3>
             <input type="hidden" id="bId">
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                <input id="bDonem" placeholder="Dönem (Örn: Ocak 2024)"> <input type="number" id="bIzin" placeholder="Kalan İzin (Gün)">
-                <input type="number" id="bBrut" placeholder="Brüt Maaş"> <input type="number" id="bNet" placeholder="Net Maaş">
-                <input type="number" id="bMesai" placeholder="Mesai / Ek Ödeme"> <input type="number" id="bYol" placeholder="Yemek ve Yol">
-                <input type="number" id="bKesinti" placeholder="Kesintiler">
+            <div class="grid2">
+                <div class="field"><label>Dönem</label><input id="bDonem" placeholder="Örn: Ocak 2024"></div>
+                <div class="field"><label>Kalan İzin (Gün)</label><input type="number" id="bIzin" placeholder="0"></div>
+                <div class="field"><label>Brüt Maaş</label><input type="number" id="bBrut" placeholder="0"></div>
+                <div class="field"><label>Net Maaş</label><input type="number" id="bNet" placeholder="0"></div>
+                <div class="field"><label>Mesai / Ek Ödeme</label><input type="number" id="bMesai" placeholder="0"></div>
+                <div class="field"><label>Yemek ve Yol</label><input type="number" id="bYol" placeholder="0"></div>
+                <div class="field"><label>Kesintiler</label><input type="number" id="bKesinti" placeholder="0"></div>
             </div>
-            <br>
-            <button class="btn-warning" onclick="bordro()">Bordroyu Kaydet</button>
-            <button class="btn-danger" onclick="gizle('bordroForm')">İptal</button>
+            <div class="form-actions">
+                <button class="btn-warning" style="background: var(--accent); color:#fff; border-color: var(--accent);" onclick="bordro()">Bordroyu Kaydet</button>
+                <button class="btn-ghost" onclick="gizle('bordroForm')">İptal</button>
+            </div>
         </div>
 
         <!-- TABLO -->
@@ -224,38 +469,105 @@
             } else alert("Hatalı giriş!");
         }
 
+        // Rol renklerini belirleyen yardımcı fonksiyon
+        function getRoleBadge(role) {
+            let bg = '#F1F1EE', color = '#565D74';
+            if (role === 'Admin') { bg = '#EAEEF7'; color = '#2E3A5C'; }
+            else if (role === 'Kovuldu') { bg = '#FBEEEC'; color = '#A8402F'; }
+            else if (role === 'Emekli') { bg = '#FBF3E6'; color = '#B8873F'; }
+            else if (role === 'Ayrıldı') { bg = '#FBF3E6'; color = '#B8873F'; }
+
+            return `<span class="badge" style="background: ${bg}; color: ${color};">${role}</span>`;
+        }
+
         async function yukle() {
             const res = await API('/admin/personeller', 'GET');
             if (!res.ok) return;
             document.getElementById('tablo').innerHTML = (await res.json()).map(p => `
-                <tr>
-                    <td>${p.UserId}</td>
-                    <td><b>${p.Username}</b></td>
-                    <td>${p.Ad || '-'} ${p.Soyad || ''}</td>
-                    <td>${p.Bolum || '-'}</td>
-                    <td><span style="background: ${p.Role === 'Admin' ? '#e3f2fd' : '#f5f5f5'}; color: ${p.Role === 'Admin' ? '#1976d2' : '#666'}; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold;">${p.Role}</span></td>
-                    <td>
-                        <button class="btn-primary" style="padding: 6px 10px; font-size: 12px;" onclick='duzenleAc(${JSON.stringify(p)})'>Düzenle</button>
-                        <button class="btn-warning" style="padding: 6px 10px; font-size: 12px;" onclick='bordroAc(${p.UserId}, "${p.Ad || p.Username}")'>Maaş Ekle</button>
-                    </td>
-                </tr>
-            `).join('');
+                    <tr>
+                        <td data-label="ID">${p.UserId}</td>
+                        <td data-label="Kullanıcı"><b>${p.Username}</b></td>
+                        <td data-label="Ad Soyad">${p.Ad || '-'} ${p.Soyad || ''}</td>
+                        <td data-label="Bölüm">${p.Bolum || '-'}</td>
+                        <td data-label="Rol">${getRoleBadge(p.Role)}</td>
+                        <td data-label="İşlemler">
+                            <div class="row-actions">
+                                <button class="btn-primary btn-sm" onclick='duzenleAc(${JSON.stringify(p)})'>Düzenle</button>
+                                <button class="btn-warning btn-sm" onclick='bordroAc(${p.UserId}, "${p.Ad || p.Username}")'>Maaş Ekle</button>
+                                <button class="btn-danger btn-sm" onclick='personelSil(${p.UserId})'>Sil</button>
+                            </div>
+                        </td>
+                    </tr>
+                `).join('');
         }
 
         async function ekle() {
-            await API('/admin/personel-ekle', 'POST', { Username: val('eUser'), Password: val('ePass'), Ad: val('eAd'), Soyad: val('eSoyad'), TcNo: val('eTc'), Bolum: val('eBolum'), Role: val('eRole') });
-            gizle('ekleForm'); yukle(); alert('Personel eklendi!');
+            let girisTarihi = val('eTarih');
+            if (!girisTarihi) {
+                girisTarihi = new Date().toISOString().split('T')[0];
+            }
+
+            const res = await API('/admin/personel-ekle', 'POST', {
+                Username: val('eUser'),
+                Password: val('ePass'),
+                Ad: val('eAd'),
+                Soyad: val('eSoyad'),
+                TcNo: val('eTc'),
+                Bolum: val('eBolum'),
+                IseGiris: girisTarihi,
+                Role: val('eRole')
+            });
+
+            if (res.ok) {
+                gizle('ekleForm');
+                yukle();
+                alert('Personel başarıyla eklendi!');
+            } else {
+                alert('HATA: Personel eklenemedi!');
+            }
         }
 
         function duzenleAc(p) {
             document.getElementById('dId').value = p.UserId;
-            ['Ad', 'Soyad', 'Tc', 'Bolum', 'Role'].forEach(k => document.getElementById('d' + k).value = p[k] || (k === 'Role' ? 'Personel' : ''));
+            document.getElementById('dAd').value = p.Ad || '';
+            document.getElementById('dSoyad').value = p.Soyad || '';
+            document.getElementById('dTc').value = p.TcNo || '';
+            document.getElementById('dBolum').value = p.Bolum || '';
+            document.getElementById('dRole').value = p.Role || 'Personel';
+
+            // Eğer veriden tarih geliyorsa formatlayıp inputa basıyoruz
+            if (p.IseGiris) {
+                document.getElementById('dTarih').value = p.IseGiris.split('T')[0];
+            } else {
+                document.getElementById('dTarih').value = '';
+            }
+
             goster('duzenleForm');
         }
 
         async function duzenle() {
-            await API('/admin/personel-guncelle', 'PUT', { UserId: +val('dId'), Ad: val('dAd'), Soyad: val('dSoyad'), TcNo: val('dTc'), Bolum: val('dBolum'), Role: val('dRole') });
-            gizle('duzenleForm'); yukle(); alert('Güncellendi!');
+            let guncelTarih = val('dTarih');
+            if (!guncelTarih) {
+                guncelTarih = new Date().toISOString().split('T')[0];
+            }
+
+            const res = await API('/admin/personel-guncelle', 'PUT', {
+                UserId: +val('dId'),
+                Ad: val('dAd'),
+                Soyad: val('dSoyad'),
+                TcNo: val('dTc'),
+                Bolum: val('dBolum'),
+                IseGiris: guncelTarih,
+                Role: val('dRole')
+            });
+
+            if (res.ok) {
+                gizle('duzenleForm');
+                yukle();
+                alert('Personel başarıyla güncellendi!');
+            } else {
+                alert('Güncelleme başarısız!');
+            }
         }
 
         function bordroAc(id, isim) {
@@ -267,6 +579,19 @@
         async function bordro() {
             await API('/admin/bordro-ekle', 'POST', { UserId: +val('bId'), Donem: val('bDonem'), NetMaas: +val('bNet'), BrutMaas: +val('bBrut'), MesaiEkOdeme: +val('bMesai'), YemekYolYardimi: +val('bYol'), Kesintiler: +val('bKesinti'), KalanIzin: +val('bIzin') });
             gizle('bordroForm'); alert('Maaş Eklendi!');
+        }
+
+        async function personelSil(id) {
+            const onay = confirm("Bu personeli ve ona ait tüm verileri silmek istediğinize emin misiniz? Bu işlem geri alınamaz.");
+            if (!onay) return;
+
+            const res = await API('/admin/personel-sil/' + id, 'DELETE');
+            if (res.ok) {
+                alert('Personel başarıyla silindi.');
+                yukle();
+            } else {
+                alert('Silme işlemi başarısız oldu.');
+            }
         }
 
         function cikis() { localStorage.clear(); location.reload(); }

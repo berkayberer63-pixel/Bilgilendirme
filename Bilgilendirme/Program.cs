@@ -125,28 +125,36 @@ app.MapGet("/admin/personeller", async () => {
 
 // Sadece Adminlerin erişebileceği detaylı personel ekleme servisi
 app.MapPost("/admin/personel-ekle", async (AdminKullaniciEkleRequest req) => {
-    string hashedPassword = BCrypt.Net.BCrypt.HashPassword(req.Password);
-
-    using var db = new SqlConnection(connStr);
-    var sql = @"INSERT INTO Users 
-                (Username, Password, TcNo, Bolum, Unvan, IseGiris, Ad, Soyad, Role) 
-                VALUES 
-                (@Username, @Password, @TcNo, @Bolum, @Unvan, @IseGiris, @Ad, @Soyad, @Role)";
-
-    await db.ExecuteAsync(sql, new
+    try
     {
-        req.Username,
-        Password = hashedPassword,
-        req.TcNo,
-        req.Bolum,
-        req.Unvan,
-        req.IseGiris,
-        req.Ad,
-        req.Soyad,
-        req.Role
-    });
+        string hashedPassword = BCrypt.Net.BCrypt.HashPassword(req.Password);
 
-    return Results.Ok();
+        using var db = new SqlConnection(connStr);
+        var sql = @"INSERT INTO Users 
+                    (Username, Password, TcNo, Bolum, Unvan, IseGiris, Ad, Soyad, Role) 
+                    VALUES 
+                    (@Username, @Password, @TcNo, @Bolum, @Unvan, @IseGiris, @Ad, @Soyad, @Role)";
+
+        await db.ExecuteAsync(sql, new
+        {
+            req.Username,
+            Password = hashedPassword,
+            req.TcNo,
+            req.Bolum,
+            req.Unvan,
+            req.IseGiris,
+            req.Ad,
+            req.Soyad,
+            req.Role
+        });
+
+        return Results.Ok();
+    }
+    catch (Exception ex)
+    {
+        // SQL'in gerçek patlama sebebini doğrudan ekrana fırlat!
+        return Results.Problem($"Ekleme Hatası: {ex.Message}");
+    }
 }).RequireAuthorization("AdminOnly");
 
 // Admin: Personel Bilgilerini Güncelleme Endpoint'i
@@ -168,6 +176,34 @@ app.MapPost("/admin/bordro-ekle", async (BordroEkleRequest req) => {
                 (@UserId, @Donem, @NetMaas, @KalanIzin, @BrutMaas, @MesaiEkOdeme, @YemekYolYardimi, @Kesintiler)";
     await db.ExecuteAsync(sql, req);
     return Results.Ok();
+}).RequireAuthorization("AdminOnly");
+
+// Admin: Personel Silme Endpoint'i
+app.MapDelete("/admin/personel-sil/{id}", async (int id) => {
+    try
+    {
+        using var db = new SqlConnection(connStr);
+
+        // Leaves tablosu olmadığı için onu sorgudan çıkardık.
+        // Sadece PersonelBordro ve Users tablolarından siliyoruz.
+        var sql = @"
+            DELETE FROM PersonelBordro WHERE UserId = @Id;
+            DELETE FROM Users WHERE UserId = @Id;
+        ";
+
+        var affectedRows = await db.ExecuteAsync(sql, new { Id = id });
+
+        if (affectedRows > 0)
+        {
+            return Results.Ok(new { Message = "Personel başarıyla silindi." });
+        }
+
+        return Results.NotFound(new { Message = "Silinecek personel bulunamadı." });
+    }
+    catch (Exception ex)
+    {
+        return Results.Problem($"Veritabanı Hatası: {ex.Message}");
+    }
 }).RequireAuthorization("AdminOnly");
 
 app.UseAuthentication();
@@ -235,3 +271,4 @@ public record BordroEkleRequest(
     int UserId, string Donem, decimal NetMaas, int KalanIzin,
     decimal BrutMaas, decimal MesaiEkOdeme, decimal YemekYolYardimi, decimal Kesintiler
 );
+
