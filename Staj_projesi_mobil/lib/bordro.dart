@@ -24,7 +24,7 @@ class _BordroState extends State<Bordro> {
   Future<void> _fetch() async {
     try {
       final res = await http.get(
-        Uri.parse('https://bilgilendirme20260908151059-gsbccpb0gbeng8gj.westus3-01.azurewebsites.net/Bordro'),
+        Uri.parse('SENİNİN_API_URL/bordro'),
         headers: {'Authorization': 'Bearer ${widget.token}'},
       );
       if (!mounted) return;

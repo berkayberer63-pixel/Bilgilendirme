@@ -45,7 +45,7 @@ class _LoginScreenState extends State<LoginScreen> {
     try {
       final response = await http.post(
         Uri.parse(
-          'https://bilgilendirme20260908151059-gsbccpb0gbeng8gj.westus3-01.azurewebsites.net/login',
+          'SENİNİN_API_URL/login',
         ),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
