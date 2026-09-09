@@ -21,7 +21,7 @@ class _ServisState extends State<Servis> {
 
   Future<void> _fetchServisler() async {
     try {
-      final response = await http.get(Uri.parse('SENİNİN_API_URL/servisler'));
+      final response = await http.get(Uri.parse('SENİN_APİ_URL/servisler'));
       
       if (response.statusCode == 200) {
         Map<String, Map<String, Map<String, String>>> tempVeriler = {};

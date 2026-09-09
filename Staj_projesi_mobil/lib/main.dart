@@ -4,17 +4,63 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'anasayfa.dart';
 
-void main() => runApp(const FabrikaApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  runApp(const FabrikaApp());
+}
 
 class FabrikaApp extends StatelessWidget {
   const FabrikaApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return const MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Personel Takip',
-      home: const LoginScreen(),
+      home: BaslangicEkrani(),
+    );
+  }
+}
+
+class BaslangicEkrani extends StatefulWidget {
+  const BaslangicEkrani({super.key});
+
+  @override
+  State<BaslangicEkrani> createState() => _BaslangicEkraniState();
+}
+
+class _BaslangicEkraniState extends State<BaslangicEkrani> {
+  @override
+  void initState() {
+    super.initState();
+    kontrolEt();
+  }
+
+  Future<void> kontrolEt() async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('auth_token');
+
+    if (!mounted) return;
+
+    if (token != null && token.isNotEmpty) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => DashboardScreen(token: token)),
+      );
+    } else {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => const LoginScreen()),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return const Scaffold(
+      body: Center(
+        child: CircularProgressIndicator(color: Colors.green),
+      ),
     );
   }
 }
@@ -44,9 +90,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
     try {
       final response = await http.post(
-        Uri.parse(
-          'SENİNİN_API_URL/login',
-        ),
+        Uri.parse('SENİN_APİ_URL/login'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'username': kullanici.text.trim(),
@@ -56,34 +100,43 @@ class _LoginScreenState extends State<LoginScreen> {
 
       if (response.statusCode == 200) {
         final token = jsonDecode(response.body)['token'];
+        final prefs = await SharedPreferences.getInstance();
 
         if (hatirla) {
-          final prefs = await SharedPreferences.getInstance();
           await prefs.setString('auth_token', token);
+        } else {
+          await prefs.remove('auth_token');
         }
 
         if (!mounted) return;
 
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(
-            builder: (_) => DashboardScreen(token: token),
-          ),
+          MaterialPageRoute(builder: (_) => DashboardScreen(token: token)),
         );
       } else {
         mesaj('Kullanıcı adı veya şifre yanlış');
       }
     } catch (e) {
-      mesaj('Sunucuya bağlanılamadı');
+      mesaj('Sunucuya bağlanılamadı: $e');
     }
 
-    if (mounted) setState(() => loading = false);
+    if (mounted) {
+      setState(() => loading = false);
+    }
   }
 
   void mesaj(String text) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(text)),
+      SnackBar(content: Text(text), behavior: SnackBarBehavior.floating),
     );
+  }
+
+  @override
+  void dispose() {
+    kullanici.dispose();
+    sifre.dispose();
+    super.dispose();
   }
 
   @override
@@ -97,18 +150,11 @@ class _LoginScreenState extends State<LoginScreen> {
             width: 380,
             child: Column(
               children: [
-                Icon(
-                  Icons.factory_rounded,
-                  size: 70,
-                  color: Colors.green.shade700,
-                ),
+                Icon(Icons.factory_rounded, size: 70, color: Colors.green.shade700),
                 const SizedBox(height: 15),
                 const Text(
                   'Personel Takip',
-                  style: TextStyle(
-                    fontSize: 27,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: TextStyle(fontSize: 27, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 8),
                 Text(
@@ -116,7 +162,6 @@ class _LoginScreenState extends State<LoginScreen> {
                   style: TextStyle(color: Colors.grey.shade600),
                 ),
                 const SizedBox(height: 30),
-
                 TextField(
                   controller: kullanici,
                   decoration: InputDecoration(
@@ -130,9 +175,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ),
                 ),
-
                 const SizedBox(height: 15),
-
                 TextField(
                   controller: sifre,
                   obscureText: !sifreGoster,
@@ -140,13 +183,11 @@ class _LoginScreenState extends State<LoginScreen> {
                     labelText: 'Şifre',
                     prefixIcon: const Icon(Icons.lock_outline),
                     suffixIcon: IconButton(
-                      icon: Icon(
-                        sifreGoster
-                            ? Icons.visibility_off
-                            : Icons.visibility,
-                      ),
+                      icon: Icon(sifreGoster ? Icons.visibility_off : Icons.visibility),
                       onPressed: () {
-                        setState(() => sifreGoster = !sifreGoster);
+                        setState(() {
+                          sifreGoster = !sifreGoster;
+                        });
                       },
                     ),
                     filled: true,
@@ -157,21 +198,20 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ),
                 ),
-
                 Row(
                   children: [
                     Checkbox(
                       value: hatirla,
                       onChanged: (value) {
-                        setState(() => hatirla = value ?? true);
+                        setState(() {
+                          hatirla = value ?? false;
+                        });
                       },
                     ),
                     const Text('Beni hatırla'),
                   ],
                 ),
-
                 const SizedBox(height: 10),
-
                 SizedBox(
                   width: double.infinity,
                   height: 52,
@@ -185,15 +225,10 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ),
                     child: loading
-                        ? const CircularProgressIndicator(
-                            color: Colors.white,
-                          )
+                        ? const CircularProgressIndicator(color: Colors.white)
                         : const Text(
                             'GİRİŞ YAP',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                            ),
+                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                           ),
                   ),
                 ),

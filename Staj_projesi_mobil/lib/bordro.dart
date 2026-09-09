@@ -24,7 +24,7 @@ class _BordroState extends State<Bordro> {
   Future<void> _fetch() async {
     try {
       final res = await http.get(
-        Uri.parse('SENİNİN_API_URL/bordro'),
+        Uri.parse('SENİN_APİ_URL/Bordro'),
         headers: {'Authorization': 'Bearer ${widget.token}'},
       );
       if (!mounted) return;
